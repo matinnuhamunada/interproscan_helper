@@ -2,3 +2,23 @@
 # Please follow the best practices: 
 # https://snakemake.readthedocs.io/en/stable/snakefiles/best_practices.html,
 # in particular regarding the standardized folder structure mentioned there. 
+
+import pandas as pd
+
+configfile: "config/config.yaml"
+
+#print(config)
+df = pd.read_csv(config['sample']).set_index("sample_id")
+
+FASTA = df.fasta.to_list()
+SAMPLE = df.index.to_list()
+
+fasta_dict = df.fasta.to_dict()
+#print(fasta_dict['CP107742.region013'])
+
+rule all:
+    input:
+        expand("/home/matinnu/datadrive/glyco_halo_mining/output/interproscan_per_region/{sample}.faa.tsv", sample=SAMPLE),
+        expand("/home/matinnu/datadrive/glyco_halo_mining/output/interproscan_per_region/{sample}.faa.json", sample=SAMPLE),
+
+include: "rules/interproscan.smk"
